@@ -1,22 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using SalesAdmin.Authentication;
-using SalesAdmin.Models;
-
-namespace SalesAdmin.Controllers
+﻿namespace SalesAdmin.Controllers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IdentityModel.Tokens.Jwt;
+    using System.Linq;
+    using System.Security.Claims;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.IdentityModel.Tokens;
+    using SalesAdmin.Authentication;
+    using SalesAdmin.Models;
+
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController : CustomControllerBase
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
@@ -37,6 +38,7 @@ namespace SalesAdmin.Controllers
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(
             [FromBody]RegisterRequest request)
         {
@@ -60,10 +62,39 @@ namespace SalesAdmin.Controllers
                     });
             }
 
-            return await LoginSuccessfulResponse(user);
+            return await LoginSuccessResponse(user);
         }
 
-        private async Task<IActionResult> LoginSuccessfulResponse(User user)
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody]LoginRequest request)
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            var result = await _signInManager.CheckPasswordSignInAsync(
+                user,
+                request.Password,
+                false
+                );
+
+            if (!result.Succeeded)
+            {
+                return BadRequest();
+            }
+
+            return await LoginSuccessResponse(user);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RefreshToken()
+        {
+
+        }
+
+        private async Task<IActionResult> LoginSuccessResponse(User user)
         {
             var claims = new List<Claim>
             {
@@ -73,7 +104,7 @@ namespace SalesAdmin.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             foreach (var role in roles)
             {
-
+                claims.Add(new Claim(ClaimTypes.Role, role));
             }
             var key = _configuration.GetValue<string>("Authentication:JwtKey");
             var token = new JwtSecurityToken(
