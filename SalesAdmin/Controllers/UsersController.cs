@@ -7,6 +7,7 @@
     using System.Security.Claims;
     using System.Text;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@
     using SalesAdmin.Authentication;
     using SalesAdmin.Models;
 
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : CustomControllerBase
@@ -66,6 +68,7 @@
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody]LoginRequest request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
@@ -88,10 +91,12 @@
             return await LoginSuccessResponse(user);
         }
 
-        [HttpGet]
+        [HttpGet("refreshToken")]
         public async Task<IActionResult> RefreshToken()
         {
-
+            var userId = GetUserId();
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            return await LoginSuccessResponse(user);
         }
 
         private async Task<IActionResult> LoginSuccessResponse(User user)

@@ -9,7 +9,7 @@ namespace SalesAdmin.Controllers
 {
     public abstract class CustomControllerBase : ControllerBase
     {
-        public int GetuserId()
+        public int GetUserId()
         {
             return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
