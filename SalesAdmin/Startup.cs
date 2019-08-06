@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using SalesAdmin.Authentication;
-
-namespace SalesAdmin
+﻿namespace SalesAdmin
 {
+    using System.Text;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.IdentityModel.Tokens;
+    using SalesAdmin.Authentication;
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -52,7 +46,6 @@ namespace SalesAdmin
                 .AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(a =>
             {
-                a.User.AllowedUserNameCharacters += "";
                 a.Password.RequireDigit = false;
                 a.Password.RequiredLength = 6;
                 a.Password.RequireLowercase = false;
