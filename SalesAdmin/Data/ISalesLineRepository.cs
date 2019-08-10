@@ -9,8 +9,8 @@ namespace SalesAdmin.Data
     {
         int CreateSalesLine(SalesLine line);
         void UpdateSalesLine(SalesLine line);
-        void DeleteSalesLine(string no, int lineNo);
-        SalesLine GetSalesLine(string no, int lineNo);
+        void DeleteSalesLine(string documentNo, int lineNo);
+        SalesLine GetSalesLine(string documentNo, int lineNo);
         IEnumerable<SalesLine> GetSalesLines(SalesLine filters);
 
     }
