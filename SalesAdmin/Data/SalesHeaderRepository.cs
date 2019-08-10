@@ -22,8 +22,8 @@
             using (var conn = GetOpenConnection())
             {
                 var id = conn.ExecuteScalar<int>(@"
-                    insert into salesheader(id, description)
-                    values(@id, @description);
+                    insert into salesHeader(id, no, description)
+                    values(@id, @no, @description);
 
                     select LAST_INSERT_ID()", salesHeader);
 
@@ -33,22 +33,22 @@
             }
         }
 
-        public void DeleteSalesHeader(int id)
+        public void DeleteSalesHeader(string no)
         {
             using (var conn = GetOpenConnection())
             {
                 conn.Execute(
-                    "delete from SalesHeader where id=@id",
-                    new { id });
+                    "delete from SalesHeader where No=@No",
+                    new { no });
             }
         }
 
-        public SalesHeader GetSalesHeader(int id)
+        public SalesHeader GetSalesHeader(string no)
         {
             using (var conn = GetOpenConnection())
             {
                 return conn.QueryFirstOrDefault<SalesHeader>
-                    ("select from salesadmin where id = @id", new { id });
+                    ("select from salesHeader where No = @No", new { no });
             }
         }
 
@@ -60,8 +60,8 @@
                 //note the 'where' in-line comment is required, it is a replacement token
                 var selector = builder.AddTemplate("select * from SalesHeader /**where**/");
 
-                if (filters.Id > 0)
-                    builder.Where("Id = @Id", new { filters.Id });
+                if (!string.IsNullOrEmpty(filters.No))
+                    builder.Where("No = @No", new { filters.No });
 
                 if (!string.IsNullOrEmpty(filters.Description))
                     builder.Where("Description = @Description", new { filters.Description });

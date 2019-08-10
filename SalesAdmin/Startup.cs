@@ -1,6 +1,7 @@
 ﻿namespace SalesAdmin
 {
     using System.Text;
+    using AutoMapper;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -11,6 +12,8 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.IdentityModel.Tokens;
     using SalesAdmin.Authentication;
+    using SalesAdmin.Data;
+    using SalesAdmin.Models;
 
     public class Startup
     {
@@ -52,6 +55,19 @@
                 a.Password.RequireNonAlphanumeric = false;
                 a.Password.RequireUppercase = false;
             });
+
+            services.AddTransient<SalesHeaderRepository>(
+                _ => new SalesHeaderRepository(
+                    Configuration.GetConnectionString("SalesAdmin")));
+
+            var mapper = new MapperConfiguration(b =>
+            {
+                b.CreateMap<SalesHeader, SalesHeaderResponse>();
+
+            }).CreateMapper();
+
+            services.AddSingleton(mapper);
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

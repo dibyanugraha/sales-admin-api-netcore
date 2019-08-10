@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SalesAdmin.Data
+namespace SalesAdmin.Models
 {
-    public class SalesHeader
+    public class SalesHeaderResponse
     {
         public int Id { get; set; }
         public string No { get; set; }
@@ -13,6 +13,5 @@ namespace SalesAdmin.Data
         public DateTime CreatedDate { get; set; }
         public DateTime LastModifiedDate { get; set; }
         public int CreatedByUserId { get; set; }
-
     }
 }

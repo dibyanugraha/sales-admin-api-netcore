@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace SalesAdmin.Data
 {
-    interface ISalesHeaderRepository
+    public interface ISalesHeaderRepository
     {
         int CreateSalesHeader(SalesHeader salesHeader);
         void UpdateSalesHeader(SalesHeader salesHeader);
-        void DeleteSalesHeader(int id);
-        SalesHeader GetSalesHeader(int id);
+        void DeleteSalesHeader(string no);
+        SalesHeader GetSalesHeader(string no);
         IEnumerable<SalesHeader> GetSalesHeaders(SalesHeader filters);
 
     }
