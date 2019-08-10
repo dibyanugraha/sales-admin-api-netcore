@@ -52,13 +52,27 @@
             }
         }
 
-        public IEnumerable<SalesHeader> GetSalesHeaders(SalesHeader filters)
+        public IEnumerable<SalesHeader> GetSalesHeaders(
+            int? page = 1,
+            int? pageSize = 10,
+            SalesHeader filters = null)
         {
             using (var conn = GetOpenConnection())
             {
-                var builder = new SqlBuilder();
-                //note the 'where' in-line comment is required, it is a replacement token
-                var selector = builder.AddTemplate("select * from SalesHeader /**where**/");
+                if ((filters == null)
+                    && (page.Value == 1)
+                    && (pageSize.Value == 10))
+                    return conn.Query<SalesHeader>(
+                        "select * from SalesHeader limit 1, 10").ToArray();
+
+                SqlBuilder builder = new SqlBuilder();
+                string query = "";
+
+                if ((page.HasValue) && (page.Value > 1)
+                    && (pageSize.HasValue))
+                    query = $"select * from SalesHeader limit { page. Value }, { pageSize.Value } /**where**/";
+
+                var selector = builder.AddTemplate(query);
 
                 if (!string.IsNullOrEmpty(filters.No))
                     builder.Where("No = @No", new { filters.No });

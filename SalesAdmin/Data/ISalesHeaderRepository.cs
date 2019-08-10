@@ -11,7 +11,10 @@ namespace SalesAdmin.Data
         void UpdateSalesHeader(SalesHeader salesHeader);
         void DeleteSalesHeader(string no);
         SalesHeader GetSalesHeader(string no);
-        IEnumerable<SalesHeader> GetSalesHeaders(SalesHeader filters);
+        IEnumerable<SalesHeader> GetSalesHeaders(
+            int? page = 1, 
+            int? pageSize = 10,
+            SalesHeader filters = null);
 
     }
 }

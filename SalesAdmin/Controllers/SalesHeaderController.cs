@@ -54,5 +54,18 @@
             var result = _mapper.Map<SalesHeaderResponse>(salesHeader);
             return Ok(result);
         }
+
+        [HttpGet("")]
+        public IActionResult List(int? page = null, int? pageSize = 10)
+        {
+            var salesHeaders = _repo.GetSalesHeaders(page, pageSize);
+
+            var result = new SalesHeaderListResponse
+            {
+                SalesHeaders = _mapper.Map<SalesHeaderResponse[]>(salesHeaders)
+            };
+
+            return Ok(result);
+        }
     }
 }
