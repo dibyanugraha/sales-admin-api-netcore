@@ -10,8 +10,8 @@ namespace SalesAdmin.Data
         public int Id { get; set; }
         public string No { get; set; }
         public string Description { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime LastModifiedDate { get; set; }
+        public DateTime CreatedDateTime { get; set; }
+        public DateTime LastModifiedDateTime { get; set; }
         public int CreatedByUserId { get; set; }
 
     }

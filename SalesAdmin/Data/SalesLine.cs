@@ -15,6 +15,8 @@ namespace SalesAdmin.Data
         public string Description { get; set; }
         public decimal? Quantity { get; set; }
         public decimal? UnitPrice { get; set; }
-
+        public DateTime CreatedDateTime { get; set; }
+        public DateTime LastModifiedDateTime { get; set; }
+        public int CreatedByUserId { get; set; }
     }
 }

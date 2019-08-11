@@ -19,15 +19,13 @@
         private readonly ISalesHeaderRepository _repo;
         private readonly IMapper _mapper;
 
-        public SalesHeaderController(
-            ISalesHeaderRepository salesHeaderRepository,
-            IMapper mapper)
+        public SalesHeaderController(ISalesHeaderRepository repo, IMapper mapper)
         {
-            _repo = salesHeaderRepository;
+            _repo = repo;
             _mapper = mapper;
         }
 
-        [HttpPost("create")]
+        [HttpPost]
         public IActionResult Create(
             string no, 
             string description = "")
@@ -44,8 +42,8 @@
             {
                 No = no,
                 Description = description,
-                CreatedDate = DateTime.UtcNow.Date,
-                LastModifiedDate = DateTime.UtcNow.Date,
+                CreatedDateTime = DateTime.Today,
+                LastModifiedDateTime = DateTime.Today,
                 CreatedByUserId = userId
             };
 
@@ -55,7 +53,14 @@
             return Ok(result);
         }
 
-        [HttpGet("")]
+        [HttpGet]
+        [Route("{no}")]
+        public async Task<ActionResult<SalesHeader>> GetByDocumentNo(string no)
+        {
+            return await _repo.GetSalesHeader(no);
+        }
+
+        [HttpGet]
         public IActionResult List(int? page = null, int? pageSize = 10)
         {
             var salesHeaders = _repo.GetSalesHeaders(page, pageSize);
@@ -66,6 +71,12 @@
             };
 
             return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var salesHeader = _repo.GetSalesHeader()
         }
     }
 }

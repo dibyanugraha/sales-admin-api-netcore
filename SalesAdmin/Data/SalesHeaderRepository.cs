@@ -43,12 +43,14 @@
             }
         }
 
-        public SalesHeader GetSalesHeader(string no)
+        public async Task<SalesHeader> GetSalesHeader(string no)
         {
             using (var conn = GetOpenConnection())
             {
-                return conn.QueryFirstOrDefault<SalesHeader>
-                    ("select from salesHeader where No = @No", new { no });
+                var result = await conn.QueryAsync<SalesHeader>
+                    ("select from salesHeader where No = @No", new { No = no });
+
+                return result.FirstOrDefault();
             }
         }
 
