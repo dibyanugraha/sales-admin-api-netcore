@@ -17,11 +17,17 @@
         {
             _connectionString = connectionString;
         }
+
         public int CreateSalesHeader(SalesHeader salesHeader)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<int> CreateSalesHeaderAsync(SalesHeader salesHeader)
         {
             using (var conn = GetOpenConnection())
             {
-                var id = conn.ExecuteScalar<int>(@"
+                var id = await conn.ExecuteScalarAsync<int>(@"
                     insert into salesHeader(id, no, description)
                     values(@id, @no, @description);
 
@@ -35,26 +41,41 @@
 
         public void DeleteSalesHeader(string no)
         {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteSalesHeaderAsync(string no)
+        {
             using (var conn = GetOpenConnection())
             {
-                conn.Execute(
+                conn.ExecuteAsync(
                     "delete from SalesHeader where No=@No",
                     new { no });
             }
         }
 
-        public async Task<SalesHeader> GetSalesHeader(string no)
+        public SalesHeader GetSalesHeader(string no)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<SalesHeader> GetSalesHeaderAsync(string no)
         {
             using (var conn = GetOpenConnection())
             {
                 var result = await conn.QueryAsync<SalesHeader>
-                    ("select from salesHeader where No = @No", new { No = no });
+                    ("select from salesHeader where No = @No", new { no });
 
                 return result.FirstOrDefault();
             }
         }
 
-        public IEnumerable<SalesHeader> GetSalesHeaders(
+        public IEnumerable<SalesHeader> GetSalesHeaders(int? page = 1, int? pageSize = 10, SalesHeader filters = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<SalesHeader>> GetSalesHeadersAsync(
             int? page = 1,
             int? pageSize = 10,
             SalesHeader filters = null)
@@ -64,8 +85,12 @@
                 if ((filters == null)
                     && (page.Value == 1)
                     && (pageSize.Value == 10))
-                    return conn.Query<SalesHeader>(
-                        "select * from SalesHeader limit 1, 10").ToArray();
+                {
+                    var queryResult = await conn.QueryAsync<SalesHeader>(
+                        "select * from SalesHeader limit 1, 10");
+
+                    return queryResult.ToArray();
+                }
 
                 SqlBuilder builder = new SqlBuilder();
                 string query = "";
@@ -82,7 +107,9 @@
                 if (!string.IsNullOrEmpty(filters.Description))
                     builder.Where("Description = @Description", new { filters.Description });
 
-                return conn.Query<SalesHeader>(selector.RawSql, selector.Parameters).ToArray();
+                var result = await conn.QueryAsync<SalesHeader>(selector.RawSql, selector.Parameters);
+
+                return result.ToArray();
             }
         }
 
@@ -94,6 +121,11 @@
                 updatedHeader.Description = salesHeader.Description;
                 conn.Update(updatedHeader);
             }
+        }
+
+        public void UpdateSalesHeaderAsync(SalesHeader salesHeader)
+        {
+            throw new NotImplementedException();
         }
 
         private DbConnection GetOpenConnection()

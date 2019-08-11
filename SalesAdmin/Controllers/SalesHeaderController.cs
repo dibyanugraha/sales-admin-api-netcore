@@ -53,8 +53,7 @@
             return Ok(result);
         }
 
-        [HttpGet]
-        [Route("{no}")]
+        [HttpGet("{no}")]
         public async Task<ActionResult<SalesHeader>> GetByDocumentNo(string no)
         {
             return await _repo.GetSalesHeader(no);
@@ -73,10 +72,19 @@
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        [HttpDelete("{no}")]
+        public IActionResult Delete(string no)
         {
-            var salesHeader = _repo.GetSalesHeader()
+            var salesHeader = _repo.GetSalesHeader(no);
+
+            if (salesHeader == null)
+            {
+                return NotFound();
+            }
+
+            _repo.DeleteSalesHeader(no);
+
+            return NoContent();
         }
     }
 }
