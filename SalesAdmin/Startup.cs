@@ -1,9 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using SalesAdmin.Models;
-namespace SalesAdmin
+﻿namespace SalesAdmin
 {
-    using System.Text;
     using AutoMapper;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Builder;
@@ -17,7 +13,9 @@ namespace SalesAdmin
     using SalesAdmin.Authentication;
     using SalesAdmin.Data;
     using SalesAdmin.Data.Dapper;
-    using SalesAdmin.Models;
+    using SalesAdmin.Models.SalesHeader;
+    using System.Collections.Generic;
+    using System.Text;
 
     public class Startup
     {
@@ -59,23 +57,26 @@ namespace SalesAdmin
                 a.Password.RequireNonAlphanumeric = false;
                 a.Password.RequireUppercase = false;
             });
-
-            services.AddTransient(
+            services.AddTransient<ISalesHeaderRepository>(
                 _ => new SalesHeaderRepository(
+                    Configuration.GetConnectionString("SalesAdmin")));
+            services.AddTransient<ISalesLineRepository>(
+                _ => new SalesLineRepository(
                     Configuration.GetConnectionString("SalesAdmin")));
 
             var mapper = new MapperConfiguration(b =>
             {
                 b.CreateMap<SalesHeader, SalesHeaderResponse>();
-
+                //b.CreateMap<IEnumerable<SalesHeader>, SalesHeaderListResponse>();
+                b.CreateMap<SalesLine, SalesLineRepository>();
             }).CreateMapper();
 
             services.AddSingleton(mapper);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddDbContext<SalesAdminContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("SalesAdminContext")));
+            //services.AddDbContext<SalesAdminContext>(options =>
+            //        options.UseSqlServer(Configuration.GetConnectionString("SalesAdminContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

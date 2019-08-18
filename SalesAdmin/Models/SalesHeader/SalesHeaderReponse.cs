@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SalesAdmin.Models
+﻿namespace SalesAdmin.Models.SalesHeader
 {
+    using System;
     public class SalesHeaderResponse
     {
         public int Id { get; set; }

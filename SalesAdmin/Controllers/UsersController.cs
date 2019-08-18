@@ -14,7 +14,7 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.IdentityModel.Tokens;
     using SalesAdmin.Authentication;
-    using SalesAdmin.Models;
+    using SalesAdmin.Models.User;
 
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
@@ -92,6 +92,7 @@
         }
 
         [HttpGet("refreshToken")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RefreshToken()
         {
             var userId = GetUserId();

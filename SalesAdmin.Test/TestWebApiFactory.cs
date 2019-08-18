@@ -19,7 +19,7 @@ namespace SalesAdmin.Test
                 var appType = typeof(TStartup);
                 var appPath = "";
 
-                configurationBuilder.AddJsonFile(@"", optional: true, reloadOnChange: true);
+                configurationBuilder.AddJsonFile($"{appPath}", optional: true, reloadOnChange: true);
                 configurationBuilder.AddEnvironmentVariables();
 
             });

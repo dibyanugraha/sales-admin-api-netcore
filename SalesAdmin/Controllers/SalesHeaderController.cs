@@ -5,10 +5,9 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using SalesAdmin.Data;
-    using SalesAdmin.Models;
+    using SalesAdmin.Models.SalesHeader;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
 
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -27,11 +26,10 @@
 
         [HttpPost]
         public async Task<IActionResult> Create(
-            string no, 
-            string description = "")
+            [FromBody] SalesHeaderRequest request)
         {
             var userId = GetUserId();
-            var existingSalesHeader = _repo.GetSalesHeader(no);
+            var existingSalesHeader = await _repo.GetSalesHeaderAsync(request.No);
 
             if (existingSalesHeader != null)
             {
@@ -40,10 +38,9 @@
 
             var salesHeader = new SalesHeader
             {
-                No = no,
-                Description = description,
-                CreatedDateTime = DateTime.Today,
-                LastModifiedDateTime = DateTime.Today,
+                No = request.No,
+                CreatedDateTime = DateTime.Today.ToUniversalTime(),
+                LastModifiedDateTime = DateTime.Today.ToUniversalTime(),
                 CreatedByUserId = userId
             };
 
@@ -66,7 +63,7 @@
 
             var result = new SalesHeaderListResponse
             {
-                SalesHeaders = _mapper.Map<SalesHeaderResponse[]>(salesHeaders)
+                SalesHeaders = _mapper.Map<IEnumerable<SalesHeaderResponse>>(salesHeaders)
             };
 
             return Ok(result);
