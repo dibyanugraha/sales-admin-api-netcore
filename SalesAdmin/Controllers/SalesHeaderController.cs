@@ -26,7 +26,7 @@
         }
 
         [HttpPost]
-        public IActionResult Create(
+        public async Task<IActionResult> Create(
             string no, 
             string description = "")
         {
@@ -47,7 +47,7 @@
                 CreatedByUserId = userId
             };
 
-            _repo.CreateSalesHeader(salesHeader);
+            await _repo.CreateSalesHeaderAsync(salesHeader);
 
             var result = _mapper.Map<SalesHeaderResponse>(salesHeader);
             return Ok(result);
@@ -56,13 +56,13 @@
         [HttpGet("{no}")]
         public async Task<ActionResult<SalesHeader>> GetByDocumentNo(string no)
         {
-            return await _repo.GetSalesHeader(no);
+            return await _repo.GetSalesHeaderAsync(no);
         }
 
         [HttpGet]
-        public IActionResult List(int? page = null, int? pageSize = 10)
+        public async Task<IActionResult> List(int? page = null, int? pageSize = 10)
         {
-            var salesHeaders = _repo.GetSalesHeaders(page, pageSize);
+            var salesHeaders = await _repo.GetSalesHeadersAsync(page, pageSize);
 
             var result = new SalesHeaderListResponse
             {
@@ -73,16 +73,16 @@
         }
 
         [HttpDelete("{no}")]
-        public IActionResult Delete(string no)
+        public async Task<IActionResult> Delete(string no)
         {
-            var salesHeader = _repo.GetSalesHeader(no);
+            var salesHeader = _repo.GetSalesHeaderAsync(no);
 
             if (salesHeader == null)
             {
                 return NotFound();
             }
 
-            _repo.DeleteSalesHeader(no);
+            await _repo.DeleteSalesHeaderAsync(no);
 
             return NoContent();
         }

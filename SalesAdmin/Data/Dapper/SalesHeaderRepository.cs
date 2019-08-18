@@ -1,7 +1,7 @@
-﻿namespace SalesAdmin.Data
+﻿namespace SalesAdmin.Data.Dapper
 {
-    using Dapper;
-    using Dapper.Contrib.Extensions;
+    using global::Dapper.Contrib.Extensions;
+    using global::Dapper;
     using MySql.Data.MySqlClient;
     using System;
     using System.Collections.Generic;
@@ -125,7 +125,12 @@
 
         public void UpdateSalesHeaderAsync(SalesHeader salesHeader)
         {
-            throw new NotImplementedException();
+            using (var conn = GetOpenConnection())
+            {
+                SalesHeader updatedHeader = conn.Get<SalesHeader>(salesHeader.Id);
+                updatedHeader.Description = salesHeader.Description;
+                conn.UpdateAsync(updatedHeader);
+            }
         }
 
         private DbConnection GetOpenConnection()

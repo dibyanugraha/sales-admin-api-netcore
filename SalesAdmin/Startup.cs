@@ -1,4 +1,7 @@
-﻿namespace SalesAdmin
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using SalesAdmin.Models;
+namespace SalesAdmin
 {
     using System.Text;
     using AutoMapper;
@@ -13,6 +16,7 @@
     using Microsoft.IdentityModel.Tokens;
     using SalesAdmin.Authentication;
     using SalesAdmin.Data;
+    using SalesAdmin.Data.Dapper;
     using SalesAdmin.Models;
 
     public class Startup
@@ -56,7 +60,7 @@
                 a.Password.RequireUppercase = false;
             });
 
-            services.AddTransient<SalesHeaderRepository>(
+            services.AddTransient(
                 _ => new SalesHeaderRepository(
                     Configuration.GetConnectionString("SalesAdmin")));
 
@@ -69,6 +73,9 @@
             services.AddSingleton(mapper);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddDbContext<SalesAdminContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("SalesAdminContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

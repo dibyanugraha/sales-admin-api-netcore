@@ -1,7 +1,7 @@
 ﻿namespace SalesAdmin.Data
 {
-    using Dapper;
-    using Dapper.Contrib.Extensions;
+    using global::Dapper;
+    using global::Dapper.Contrib.Extensions;
     using MySql.Data.MySqlClient;
     using System;
     using System.Collections.Generic;
@@ -59,7 +59,6 @@
 
         public SalesLine GetSalesLine(string documentNo, int lineNo)
         {
-
             using (var conn = GetOpenConnection())
             {
                 return conn.QueryFirstOrDefault<SalesLine>(
@@ -115,6 +114,101 @@
                 builder.Where("UnitPrice = @UnitPrice", new { a = filters.UnitPrice.GetValueOrDefault() });
 
                 return conn.Query<SalesLine>(selector.RawSql, selector.Parameters).ToArray();
+            }
+        }
+
+        public async Task<int> CreateSalesLineAsync(SalesLine line)
+        {
+            using (var conn = GetOpenConnection())
+            {
+                var id = await conn.ExecuteScalarAsync<int>(@"
+                    insert into 
+                        SalesLine(id, documentNo, lineNo, type, no, description, quantity, unitPrice)
+                        values(@Id, @DocumentNo, @LineNo, @Type, @No, @Description, @Quantity, @UnitPrice);
+
+                    select LAST_INSERT_ID()", line);
+
+                line.Id = id;
+
+                return id;
+            }
+        }
+
+        public async void UpdateSalesLineAsync(SalesLine line)
+        {
+            using (var conn = GetOpenConnection())
+            {
+                SalesLine updatedLine = conn.Get<SalesLine>(line.Id);
+                updatedLine.DocumentNo = line.DocumentNo;
+                updatedLine.LineNo = line.LineNo;
+                updatedLine.Type = line.Type;
+                updatedLine.No = line.No;
+                updatedLine.Description = line.Description;
+                updatedLine.Quantity = line.Quantity;
+                updatedLine.UnitPrice = line.UnitPrice;
+                await conn.UpdateAsync(updatedLine);
+            }
+        }
+
+        public async void DeleteSalesLineAsync(string documentNo, int lineNo)
+        {
+            using (var conn = GetOpenConnection())
+            {
+                await conn.ExecuteAsync(
+                    "delete from SalesLine " +
+                    "   where documentNo=@DocumentNo " +
+                    "       and lineNo=@LineNo",
+                    new
+                    {
+                        documentNo,
+                        lineNo
+                    });
+            }
+        }
+
+        public async Task<SalesLine> GetSalesLineAsync(string documentNo, int lineNo)
+        {
+            using (var conn = GetOpenConnection())
+            {
+                return await conn.QueryFirstOrDefaultAsync<SalesLine>(
+                    "select from SalesLine " +
+                    "where documentNo = @documentNo" +
+                    "and lineNo = @lineNo",
+                    new { documentNo, lineNo });
+            }
+        }
+
+        public async Task<IEnumerable<SalesLine>> GetSalesLinesAsync(SalesLine filters)
+        {
+            if (filters == null)
+                return null;
+
+            using (var conn = GetOpenConnection())
+            {
+                SqlBuilder builder = new SqlBuilder();
+                string query = "";
+
+                query = @"select * from SalesLine /**where**/";
+
+                var selector = builder.AddTemplate(query);
+
+                if (!string.IsNullOrEmpty(filters.DocumentNo))
+                    builder.Where("DocumentNo = @DocumentNo", new { filters.DocumentNo });
+
+                builder.Where("LineNo = @LineNo", new { a = filters.LineNo.GetValueOrDefault() });
+
+                builder.Where("Type = @Type", new { a = filters.Type.GetValueOrDefault() });
+
+                if (!string.IsNullOrEmpty(filters.No))
+                    builder.Where("No = @No", new { filters.No });
+
+                if (!string.IsNullOrEmpty(filters.Description))
+                    builder.Where("Description = @Description", new { filters.Description });
+
+                builder.Where("Quantity = @Quantity", new { a = filters.Quantity.GetValueOrDefault() });
+                builder.Where("UnitPrice = @UnitPrice", new { a = filters.UnitPrice.GetValueOrDefault() });
+
+                return await conn.QueryAsync<SalesLine>(selector.RawSql, selector.Parameters);
             }
         }
     }
